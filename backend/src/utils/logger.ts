@@ -10,6 +10,17 @@ export const logger = {
     );
   },
 
+  warn: (message: string, metadata?: unknown) => {
+    console.log(
+      JSON.stringify({
+        level: 'WARN',
+        message,
+        metadata,
+        timestamp: new Date().toISOString(),
+      })
+    );
+  },
+
   error: (message: string, metadata?: unknown) => {
     console.error(
       JSON.stringify({

@@ -1,11 +1,19 @@
-import dotenv from "dotenv";
+import dotenv, { config } from "dotenv";
 import app from "./app";
 import { env } from './config';
+import { connectDatabase } from "./config/database";
+import { logger } from "./utils/logger";
 
 const PORT = env.PORT;
 
 dotenv.config();
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+const bootstrap = async () => {
+  await connectDatabase();
+
+  app.listen(PORT, () => {
+    logger.info(`Server running on port ${PORT}`);
+  });
+};
+
+bootstrap();

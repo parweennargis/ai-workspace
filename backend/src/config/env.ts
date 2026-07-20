@@ -7,6 +7,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(4000),
   NODE_ENV: z.enum(['development', 'production', 'test']),
   GEMINI_API_KEY: z.string().optional().default(''),
+  MONGODB_URI: z.string().min(1),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
