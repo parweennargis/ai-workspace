@@ -35,7 +35,7 @@ class AIService {
         const status = (error as { status?: number })?.status;
         const jitter = Math.floor(Math.random() * 500);
         const backoffMs = INITIAL_BACKOFF_MS * 2 ** attempt + jitter;
-        console.warn(`Gemini request failed. Status=${status}. Attempt=${attempt}`);
+        logger.warn('Gemini request failed, retrying', { status, attempt, backoffMs });
         await sleep(backoffMs);
       }
     }
@@ -43,10 +43,17 @@ class AIService {
     const errorMessage = lastError instanceof Error ? lastError.message : 'Unknown error';
     const errorStack = lastError instanceof Error ? lastError.stack : undefined;
 
-    console.error('Gemini Error:', lastError);
     logger.error(errorMessage, { stack: errorStack });
 
-    throw new AppError(`Failed to generate AI response: ${errorMessage}`, 500);
+    if (isRetryableStatus(lastError)) {
+      throw new AppError('AI service is temporarily unavailable. Please try again.', 503, {
+        cause: lastError,
+      });
+    }
+
+    throw new AppError('Failed to generate AI response. Please try again.', 500, {
+      cause: lastError,
+    });
   }
 }
 

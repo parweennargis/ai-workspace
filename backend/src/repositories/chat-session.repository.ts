@@ -44,6 +44,20 @@ class ChatSessionRepository {
       { new: true }
     ).lean<ChatSessionLean>();
   }
+
+  async updateStats(
+    id: Types.ObjectId | string,
+    { messageCountIncrement, lastMessageAt }: { messageCountIncrement: number; lastMessageAt: Date }
+  ): Promise<ChatSessionLean | null> {
+    return ChatSession.findByIdAndUpdate(
+      id,
+      {
+        $inc: { messageCount: messageCountIncrement },
+        $set: { lastMessageAt },
+      },
+      { new: true }
+    ).lean<ChatSessionLean>();
+  }
 }
 
 export const chatSessionRepository = new ChatSessionRepository();
