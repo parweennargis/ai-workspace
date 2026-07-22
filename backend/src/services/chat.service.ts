@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { GEMINI_MODEL_NAME } from '../ai';
+import { GEMINI_MODEL_NAME, promptBuilder } from '../ai';
 import { ChatSessionStatus } from '../models/chat-session.model';
 import { AIProvider, MessageRole } from '../models/message.model';
 import { chatSessionRepository, ChatSessionLean } from '../repositories/chat-session.repository';
@@ -25,15 +25,17 @@ class ChatService {
   async sendMessage(input: SendMessageInput): Promise<SendMessageResult> {
     const session = await this.validateSession(input.sessionId, input.userId);
 
+    const history = await messageRepository.findLatestBySessionId(session._id, HISTORY_LIMIT);
     const userMessage = await messageRepository.create({
       sessionId: session._id,
       role: MessageRole.USER,
       content: input.content,
     });
 
-    const history = await messageRepository.findLatestBySessionId(session._id, HISTORY_LIMIT);
-
-    const prompt = this.buildPrompt(history);
+    const prompt = promptBuilder.build({
+      history,
+      userMessage: input.content,
+    });
 
     let completion: string;
 
@@ -103,17 +105,6 @@ class ChatService {
     }
 
     return session;
-  }
-
-  private buildPrompt(history: MessageLean[]): string {
-    const lines = history.map((message) => {
-      const speaker = message.role === MessageRole.ASSISTANT ? 'Assistant' : 'User';
-      return `${speaker}: ${message.content}`;
-    });
-
-    lines.push('Assistant:');
-
-    return lines.join('\n');
   }
 }
 
