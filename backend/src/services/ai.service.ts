@@ -1,4 +1,4 @@
-import { geminiModel } from '../ai';
+import { AIProviderClient, geminiProvider } from '../ai';
 import { AppError } from '../utils/app-error';
 import { logger } from '../utils/logger';
 
@@ -14,17 +14,15 @@ function sleep(ms: number): Promise<void> {
 }
 
 class AIService {
+  constructor(private readonly provider: AIProviderClient) {}
+
   async generateText(prompt: string): Promise<string> {
     let lastError: unknown;
 
     const MAX_ATTEMPTS = 4;
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       try {
-        const result = await geminiModel.generateContent(prompt);
-
-        const response = result.response;
-
-        return response.text();
+        return await this.provider.generateText(prompt);
       } catch (error) {
         lastError = error;
 
@@ -35,7 +33,7 @@ class AIService {
         const status = (error as { status?: number })?.status;
         const jitter = Math.floor(Math.random() * 500);
         const backoffMs = INITIAL_BACKOFF_MS * 2 ** attempt + jitter;
-        logger.warn('Gemini request failed, retrying', { status, attempt, backoffMs });
+        logger.warn('AI provider request failed, retrying', { status, attempt, backoffMs });
         await sleep(backoffMs);
       }
     }
@@ -57,4 +55,4 @@ class AIService {
   }
 }
 
-export const aiService = new AIService();
+export const aiService = new AIService(geminiProvider);

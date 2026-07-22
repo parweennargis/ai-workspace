@@ -8,8 +8,7 @@ export class AIController {
     try {
         const { prompt } = req.body;
 
-        const response =
-        await aiService.generateText(prompt);
+        const response = await aiService.generateText(prompt);
 
         return res.status(200).json({
             success: true,
