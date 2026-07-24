@@ -1,4 +1,4 @@
-import { AIProviderClient, geminiProvider } from '../ai';
+import { AICompletionResult, AIProviderClient, geminiProvider } from '../ai';
 import { AppError } from '../utils/app-error';
 import { logger } from '../utils/logger';
 
@@ -16,7 +16,7 @@ function sleep(ms: number): Promise<void> {
 class AIService {
   constructor(private readonly provider: AIProviderClient) {}
 
-  async generateText(prompt: string): Promise<string> {
+  async generateText(prompt: string): Promise<AICompletionResult> {
     let lastError: unknown;
 
     const MAX_ATTEMPTS = 4;

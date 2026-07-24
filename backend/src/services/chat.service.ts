@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { GEMINI_MODEL_NAME, promptBuilder } from '../ai';
+import { AICompletionResult, GEMINI_MODEL_NAME, promptBuilder } from '../ai';
 import { ChatSessionStatus } from '../models/chat-session.model';
 import { AIProvider, MessageRole } from '../models/message.model';
 import { chatSessionRepository, ChatSessionLean } from '../repositories/chat-session.repository';
@@ -37,7 +37,7 @@ class ChatService {
       userMessage: input.content,
     });
 
-    let completion: string;
+    let completion: AICompletionResult;
 
     try {
       completion = await aiService.generateText(prompt);
@@ -65,9 +65,12 @@ class ChatService {
     const assistantMessage = await messageRepository.create({
       sessionId: session._id,
       role: MessageRole.ASSISTANT,
-      content: completion,
+      content: completion.text,
       provider: AIProvider.GEMINI,
       model: GEMINI_MODEL_NAME,
+      promptTokens: completion.usage?.promptTokens,
+      completionTokens: completion.usage?.completionTokens,
+      totalTokens: completion.usage?.totalTokens,
     });
 
     const updatedSession = await chatSessionRepository.updateStats(session._id, {
