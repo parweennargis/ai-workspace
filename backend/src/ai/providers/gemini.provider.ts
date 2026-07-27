@@ -15,6 +15,12 @@ export class GeminiProvider implements AIProviderClient {
       },
     };
   }
+
+  async countTokens(text: string): Promise<number> {
+    const result = await geminiModel.countTokens(text);
+
+    return result.totalTokens;
+  }
 }
 
 export const geminiProvider = new GeminiProvider();

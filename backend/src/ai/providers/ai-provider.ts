@@ -11,4 +11,5 @@ export interface AICompletionResult {
 
 export interface AIProviderClient {
   generateText(prompt: string): Promise<AICompletionResult>;
+  countTokens(text: string): Promise<number>;
 }
