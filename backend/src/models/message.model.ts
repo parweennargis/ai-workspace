@@ -30,7 +30,6 @@ const messageSchema = new Schema<IMessage>(
       type: Schema.Types.ObjectId,
       ref: 'ChatSession',
       required: true,
-      index: true,
     },
     role: {
       type: String,
@@ -76,7 +75,7 @@ const messageSchema = new Schema<IMessage>(
   }
 );
 
-messageSchema.index({ sessionId: 1, createdAt: 1 });
+messageSchema.index({ sessionId: 1, createdAt: 1, _id: 1 });
 messageSchema.index({ sessionId: 1, role: 1 });
 
 export const Message = mongoose.model<IMessage>('Message', messageSchema);

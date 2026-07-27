@@ -43,7 +43,7 @@ class MessageRepository {
     limit: number
   ): Promise<MessageLean[]> {
     const messages = await Message.find({ sessionId })
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1, _id: -1 })
       .limit(limit)
       .lean<MessageLean[]>();
 
