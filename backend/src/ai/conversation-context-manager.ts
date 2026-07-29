@@ -2,6 +2,8 @@ import { PromptHistoryMessage } from './prompt-builder';
 import { AIProviderClient } from './providers/ai-provider';
 import { geminiProvider } from './providers/gemini.provider';
 
+// Application-level input budget, not the model's maximum context window — intentionally
+// leaves room below that ceiling for the model's own output tokens.
 export const CONTEXT_TOKEN_BUDGET = 8000;
 
 export interface BuildContextInput {
